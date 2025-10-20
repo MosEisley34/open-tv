@@ -5,7 +5,7 @@ import { ErrorService } from "../error.service";
 import { NetworkInfo } from "../models/networkInfo";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
-import { save } from "@tauri-apps/plugin-dialog";
+import { save } from "../tauri/dialog";
 import { sanitizeFileName } from "../utils";
 import { CHANNEL_EXTENSION } from "../models/extensions";
 

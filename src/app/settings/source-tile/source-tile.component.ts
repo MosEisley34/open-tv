@@ -7,7 +7,7 @@ import { EditChannelModalComponent } from "../../edit-channel-modal/edit-channel
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { EditGroupModalComponent } from "../../edit-group-modal/edit-group-modal.component";
 import { ImportModalComponent } from "../../import-modal/import-modal.component";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { open, save } from "../../tauri/dialog";
 import { CHANNEL_EXTENSION, FAVS_BACKUP, PLAYLIST_EXTENSION } from "../../models/extensions";
 import { sanitizeFileName } from "../../utils";
 

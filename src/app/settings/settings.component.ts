@@ -3,7 +3,7 @@ import { debounceTime, distinctUntilChanged, fromEvent, map, Subscription } from
 import { Settings } from "../models/settings";
 import { invoke } from "@tauri-apps/api/core";
 import { Router } from "@angular/router";
-import { open } from "@tauri-apps/plugin-dialog";
+import { open } from "../tauri/dialog";
 import { Source } from "../models/source";
 import { MemoryService } from "../memory.service";
 import { ViewMode } from "../models/viewMode";

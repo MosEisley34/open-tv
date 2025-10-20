@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { writeText } from '../tauri/clipboard';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
