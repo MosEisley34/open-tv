@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { MemoryService } from "../memory.service";
-import { open } from "@tauri-apps/plugin-shell";
+import { open } from "../tauri/shell";
 
 @Component({
   selector: "app-whats-new-modal",

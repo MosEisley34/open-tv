@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { open } from "@tauri-apps/plugin-dialog";
+import { open } from "../tauri/dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { MemoryService } from "../memory.service";
 

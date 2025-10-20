@@ -9,7 +9,7 @@ import { MediaType } from "../../models/mediaType";
 import { DownloadService } from "../../download.service";
 import { Subscription, take } from "rxjs";
 import { Download } from "../../models/download";
-import { save } from "@tauri-apps/plugin-dialog";
+import { save } from "../../tauri/dialog";
 import { getDateFormatted, getExtension, sanitizeFileName } from "../../utils";
 
 @Component({

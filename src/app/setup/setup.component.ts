@@ -5,7 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { invoke } from "@tauri-apps/api/core";
 import { SourceType } from "../models/sourceType";
 import { Source } from "../models/source";
-import { open } from "@tauri-apps/plugin-dialog";
+import { open } from "../tauri/dialog";
 import { ConfirmModalComponent } from "./confirm-modal/confirm-modal.component";
 import { MemoryService } from "../memory.service";
 import { ErrorService } from "../error.service";

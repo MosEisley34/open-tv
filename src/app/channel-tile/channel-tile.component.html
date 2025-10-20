@@ -10,7 +10,7 @@
   class="channel d-inline-flex p-2 align-items-center"
   (contextmenu)="onRightClick($event)"
 >
-  <div style="height: 100%; min-width: 50px">
+  <div class="channel-image-wrapper">
     <img
       (error)="showImage = false"
       class="channel-image"
@@ -18,7 +18,14 @@
       src="{{ channel?.image }}"
     />
   </div>
-  <div class="channel-title">{{ channel?.name }}</div>
+  <div class="channel-content">
+    <div class="channel-title">{{ channel?.name }}</div>
+    <div class="channel-meta" *ngIf="channel?.provider || channel?.group">
+      <span class="channel-meta-provider" *ngIf="channel?.provider">{{ channel?.provider }}</span>
+      <span class="channel-meta-divider" *ngIf="channel?.provider && channel?.group">•</span>
+      <span class="channel-meta-group" *ngIf="channel?.group">{{ channel?.group }}</span>
+    </div>
+  </div>
   <svg
     *ngIf="channel?.tv_archive === true"
     fill="currentColor"

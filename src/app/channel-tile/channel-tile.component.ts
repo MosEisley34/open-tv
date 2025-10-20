@@ -24,7 +24,7 @@ import { RestreamModalComponent } from "../restream-modal/restream-modal.compone
 import { DownloadService } from "../download.service";
 import { Download } from "../models/download";
 import { Subscription, take } from "rxjs";
-import { save } from "@tauri-apps/plugin-dialog";
+import { save } from "../tauri/dialog";
 import { CHANNEL_EXTENSION, GROUP_EXTENSION, RECORD_EXTENSION } from "../models/extensions";
 import { getDateFormatted, getExtension, sanitizeFileName } from "../utils";
 import { NodeType, fromMediaType } from "../models/nodeType";
