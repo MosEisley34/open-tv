@@ -14,9 +14,9 @@ use types::{Channel, Source};
 use crate::types::ChannelPreserve;
 use crate::{
     log, media_type, source_type,
-    utils::get_user_agent_from_source,
     sql::{self, set_channel_group_id},
     types::{self, ChannelHttpHeaders},
+    utils::get_user_agent_from_source,
 };
 
 static NAME_REGEX: LazyLock<Regex> =
@@ -175,8 +175,14 @@ pub async fn get_m3u8_from_link(source: Source, wipe: bool) -> Result<()> {
     let url = source.url.clone().context("Invalid source")?;
     let mut response = client.get(&url).send().await?;
     if !response.status().is_success() {
-        log::log(format!("Failed to get m3u8 from link, status: {}", response.status()));
-        bail!("Failed to get m3u8 from link, status: {}", response.status());
+        log::log(format!(
+            "Failed to get m3u8 from link, status: {}",
+            response.status()
+        ));
+        bail!(
+            "Failed to get m3u8 from link, status: {}",
+            response.status()
+        );
     }
     let mut file = std::fs::File::create(get_tmp_path())?;
     while let Some(chunk) = response.chunk().await? {
@@ -267,6 +273,7 @@ fn get_channel_from_lines(
         id: None,
         name: name.trim().to_string(),
         group: group.map(|x| x.trim().to_string()),
+        provider: None,
         image: image.map(|x| x.trim().to_string()),
         url: Some(second.clone()),
         media_type: get_media_type(second),

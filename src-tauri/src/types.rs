@@ -14,6 +14,8 @@ pub struct Channel {
     pub name: String,
     pub url: Option<String>,
     pub group: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub provider: Option<String>,
     pub image: Option<String>,
     pub media_type: u8,
     #[serde(skip_serializing_if = "Option::is_none")]

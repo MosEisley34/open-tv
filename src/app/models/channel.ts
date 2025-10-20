@@ -3,6 +3,8 @@ import { MediaType } from "./mediaType";
 export class Channel {
   id?: number;
   name?: string;
+  provider?: string;
+  group?: string;
   group_id?: number;
   image?: string;
   url?: string;
