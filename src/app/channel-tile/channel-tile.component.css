@@ -1,6 +1,7 @@
 .channel {
   border-radius: 0.25rem;
-  height: 3em;
+  min-height: 3em;
+  height: auto;
   width: 100%;
   background: #343a40;
   overflow-y: hidden;
@@ -9,13 +10,38 @@
   transition: width 0.5s ease-out;
 }
 
-.channel-title {
+.channel-image-wrapper {
+  min-width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.channel-content {
+  display: flex;
+  flex-direction: column;
   margin-left: 10px;
   margin-right: 10px;
+  min-width: 0;
+}
+
+.channel-title {
   font-size: 0.9rem;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.channel-meta {
+  font-size: 0.75rem;
+  color: #adb5bd;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.channel-meta-divider {
+  margin: 0 0.25rem;
 }
 
 .channel-image {

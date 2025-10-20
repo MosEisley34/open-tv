@@ -463,28 +463,31 @@ pub fn search(filters: Filters) -> Result<Vec<Channel>> {
     };
     let mut sql_query = format!(
         r#"
-        SELECT * FROM CHANNELS
+        SELECT c.*, g.name AS group_name, s.name AS provider_name
+        FROM channels c
+        LEFT JOIN groups g ON c.group_id = g.id
+        LEFT JOIN sources s ON c.source_id = s.id
         WHERE ({})
-        AND media_type IN ({})
-        AND source_id IN ({})
-        AND url IS NOT NULL"#,
+        AND c.media_type IN ({})
+        AND c.source_id IN ({})
+        AND c.url IS NOT NULL"#,
         get_keywords_sql(keywords.len()),
         generate_placeholders(media_types.len()),
         generate_placeholders(filters.source_ids.len()),
     );
     let mut baked_params = 2;
     if filters.view_type == view_type::FAVORITES && filters.series_id.is_none() {
-        sql_query += "\nAND favorite = 1";
+        sql_query += "\nAND c.favorite = 1";
     }
     if filters.series_id.is_some() {
-        sql_query += &format!("\nAND series_id = ?");
+        sql_query += &format!("\nAND c.series_id = ?");
         baked_params += 1;
     } else if filters.group_id.is_some() {
-        sql_query += &format!("\nAND group_id = ?");
+        sql_query += &format!("\nAND c.group_id = ?");
         baked_params += 1;
     }
     if filters.season.is_some() {
-        sql_query += &format!("\nAND season_id = ?");
+        sql_query += &format!("\nAND c.season_id = ?");
         baked_params += 1;
     }
     let order = match filters.sort {
@@ -492,12 +495,14 @@ pub fn search(filters: Filters) -> Result<Vec<Channel>> {
         _ => "ASC",
     };
     if filters.view_type == view_type::HISTORY {
-        sql_query += "\nAND last_watched IS NOT NULL";
-        sql_query += "\nORDER BY last_watched DESC";
+        sql_query += "\nAND c.last_watched IS NOT NULL";
+        sql_query += "\nORDER BY c.last_watched DESC";
     } else if filters.season.is_some() {
-        sql_query += &format!("\nORDER BY episode_num {0}, name {0}", order)
-    } else if filters.sort != sort_type::PROVIDER {
-        sql_query += &format!("\nORDER BY name {}", order);
+        sql_query += &format!("\nORDER BY c.episode_num {0}, c.name {0}", order)
+    } else if filters.sort == sort_type::PROVIDER {
+        sql_query += "\nORDER BY provider_name IS NULL, provider_name ASC, c.name ASC";
+    } else {
+        sql_query += &format!("\nORDER BY c.name {}", order);
     }
     sql_query += "\nLIMIT ?, ?";
     let mut params: Vec<&dyn rusqlite::ToSql> = Vec::with_capacity(
@@ -572,6 +577,7 @@ fn season_row_to_channel(row: &Row) -> std::result::Result<Channel, rusqlite::Er
         image: row.get("image")?,
         favorite: false,
         group: None,
+        provider: None,
         group_id: None,
         media_type: media_type::SEASON,
         name: row.get("name")?,
@@ -640,11 +646,12 @@ pub fn search_group(filters: Filters) -> Result<Vec<Channel>> {
     let mut params: Vec<&dyn rusqlite::ToSql> = Vec::with_capacity(2 + filters.source_ids.len());
     let mut sql_query = format!(
         r#"
-        SELECT *
-        FROM groups
+        SELECT g.*, s.name AS provider_name
+        FROM groups g
+        LEFT JOIN sources s ON g.source_id = s.id
         WHERE ({})
-        AND source_id in ({})
-        AND (media_type IS NULL OR media_type in ({}))
+        AND g.source_id in ({})
+        AND (g.media_type IS NULL OR g.media_type in ({}))
     "#,
         get_keywords_sql(keywords.len()),
         generate_placeholders(filters.source_ids.len()),
@@ -656,7 +663,9 @@ pub fn search_group(filters: Filters) -> Result<Vec<Channel>> {
             sort_type::ALPHABETICAL_DESC => "DESC",
             _ => "ASC",
         };
-        sql_query += &format!("\nORDER BY name {}", order);
+        sql_query += &format!("\nORDER BY g.name {}", order);
+    } else if filters.sort == sort_type::PROVIDER {
+        sql_query += "\nORDER BY provider_name IS NULL, provider_name ASC, g.name ASC";
     }
     sql_query += "\nLIMIT ?, ?";
     params.extend(to_to_sql(&keywords));
@@ -677,6 +686,7 @@ fn row_to_group(row: &Row) -> std::result::Result<Channel, rusqlite::Error> {
         id: row.get("id")?,
         name: row.get("name")?,
         group: None,
+        provider: row.get("provider_name")?,
         image: row.get("image")?,
         media_type: media_type::GROUP,
         url: None,
@@ -697,6 +707,8 @@ fn row_to_channel(row: &Row) -> std::result::Result<Channel, rusqlite::Error> {
         id: row.get("id")?,
         name: row.get("name")?,
         group_id: row.get("group_id")?,
+        group: row.get("group_name")?,
+        provider: row.get("provider_name")?,
         image: row.get("image")?,
         media_type: row.get("media_type")?,
         source_id: row.get("source_id")?,
@@ -704,7 +716,6 @@ fn row_to_channel(row: &Row) -> std::result::Result<Channel, rusqlite::Error> {
         favorite: row.get("favorite")?,
         episode_num: row.get("episode_num")?,
         series_id: None,
-        group: None,
         stream_id: row.get("stream_id")?,
         tv_archive: row.get("tv_archive")?,
         season_id: row.get("season_id")?,
@@ -1164,6 +1175,7 @@ fn row_to_custom_channel(row: &Row) -> Result<CustomChannel, rusqlite::Error> {
             favorite: false,
             group_id: None,
             group: None,
+            provider: None,
             id: None,
             series_id: None,
             source_id: None,
