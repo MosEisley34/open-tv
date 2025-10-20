@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { ensureTauri } from "./env";
 
 export interface DialogFilter {
   name: string;
@@ -33,6 +34,7 @@ type OpenDialogReturn<T extends OpenDialogOptions> = T["directory"] extends true
 export async function open<T extends OpenDialogOptions>(
   options: T = {} as T,
 ): Promise<OpenDialogReturn<T>> {
+  ensureTauri("File dialog is not available outside of the Tauri environment.");
   if (typeof options === "object") {
     Object.freeze(options);
   }
@@ -42,6 +44,7 @@ export async function open<T extends OpenDialogOptions>(
 export async function save(
   options: SaveDialogOptions = {},
 ): Promise<string | null> {
+  ensureTauri("File dialog is not available outside of the Tauri environment.");
   if (typeof options === "object") {
     Object.freeze(options);
   }
