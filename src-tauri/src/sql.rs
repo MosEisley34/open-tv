@@ -471,7 +471,7 @@ pub fn search(filters: Filters) -> Result<Vec<Channel>> {
         AND c.media_type IN ({})
         AND c.source_id IN ({})
         AND c.url IS NOT NULL"#,
-        get_keywords_sql(keywords.len()),
+        get_keywords_sql(keywords.len(), "c.name"),
         generate_placeholders(media_types.len()),
         generate_placeholders(filters.source_ids.len()),
     );
@@ -548,7 +548,7 @@ fn search_series(filters: Filters) -> Result<Vec<Channel>> {
       AND source_id = ?
       AND series_id = ?
       "#,
-        get_keywords_sql(keywords.len()),
+        get_keywords_sql(keywords.len(), "name"),
     );
     let order = match filters.sort {
         sort_type::ALPHABETICAL_DESC => "DESC",
@@ -595,8 +595,8 @@ fn to_to_sql<T: rusqlite::ToSql>(values: &[T]) -> Vec<&dyn rusqlite::ToSql> {
     values.iter().map(|x| x as &dyn rusqlite::ToSql).collect()
 }
 
-fn get_keywords_sql(size: usize) -> String {
-    std::iter::repeat("name LIKE ?")
+fn get_keywords_sql(size: usize, column: &str) -> String {
+    std::iter::repeat_with(|| format!("{column} LIKE ?"))
         .take(size)
         .collect::<Vec<_>>()
         .join(" AND ")
@@ -653,7 +653,7 @@ pub fn search_group(filters: Filters) -> Result<Vec<Channel>> {
         AND g.source_id in ({})
         AND (g.media_type IS NULL OR g.media_type in ({}))
     "#,
-        get_keywords_sql(keywords.len()),
+        get_keywords_sql(keywords.len(), "g.name"),
         generate_placeholders(filters.source_ids.len()),
         generate_placeholders(media_types.len())
     );
